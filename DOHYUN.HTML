@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도현이의 바닷속 탐험</title>
+    <style>
+        /* =========================================
+           도현이 맞춤형 바다 테마 (Ocean Theme)
+           ========================================= */
+        :root {
+            --bg-color: #e0f7fa; /* 맑은 바닷물 색 */
+            --card-bg: #ffffff;
+            --text-main: #0277bd; /* 깊은 바다 색 */
+            --text-muted: #4fc3f7;
+            --border-color: #b2ebf2;
+            --btn-hover: #e1f5fe;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', 'CookieRun', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 20px 20px 60px; min-height: 100vh; background-image: radial-gradient(#ffffff 20%, transparent 20%), radial-gradient(#ffffff 20%, transparent 20%); background-color: var(--bg-color); background-position: 0 0, 25px 25px; background-size: 50px 50px; }
+        
+        /* 귀여운 상단 응원 메시지 */
+        .ticker-wrap { width: 100%; max-width: 600px; background-color: rgba(255, 255, 255, 0.9); border-radius: 20px; margin-bottom: 20px; overflow: hidden; padding: 16px; box-shadow: 0 4px 12px rgba(0,188,212,0.15); border: 2px dashed #00bcd4; text-align: center; }
+        .quote-text { font-size: 16px; font-weight: bold; color: #00acc1; margin-bottom: 4px; }
+        
+        .container { width: 100%; max-width: 600px; background-color: var(--card-bg); border-radius: 24px; box-shadow: 0 8px 24px rgba(0, 188, 212, 0.15); padding: 30px; position: relative; border: 4px solid #e0f7fa; }
+
+        .header-top { text-align: center; margin-bottom: 24px; }
+        .header-top h1 { font-size: 28px; color: #0277bd; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+        /* 바닷속 느낌의 진행률 바 */
+        .dashboard { background-color: #e1f5fe; border-radius: 16px; padding: 20px; margin-bottom: 24px; text-align: center; }
+        .cheer-msg { font-size: 18px; font-weight: bold; color: #ff9800; margin-bottom: 16px; display: block; }
+        .progress-bar-container { height: 24px; background-color: #ffffff; border-radius: 12px; overflow: hidden; margin-bottom: 8px; border: 2px solid #81d4fa; position: relative; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #4fc3f7, #03a9f4); width: 0%; border-radius: 10px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .progress-text { font-size: 14px; font-weight: bold; color: #0288d1; }
+
+        /* 아이들이 누르기 쉬운 큼직한 입력창 */
+        .input-section { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+        .input-section input[type="text"] { flex-grow: 1; padding: 16px; border: 2px solid #b2ebf2; border-radius: 12px; font-size: 16px; outline: none; transition: border-color 0.2s; min-width: 200px; }
+        .input-section input[type="text"]:focus { border-color: #00bcd4; }
+        .input-section select { padding: 0 16px; border: 2px solid #b2ebf2; border-radius: 12px; font-size: 16px; background-color: #fff; outline: none; cursor: pointer; color: #0277bd; font-weight: bold; }
+        .input-section button { padding: 0 24px; background-color: #00bcd4; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.1s, background-color 0.2s; box-shadow: 0 4px 0 #0097a7; }
+        .input-section button:active { transform: translateY(4px); box-shadow: none; }
+
+        /* 큼직하고 귀여운 할 일 목록 */
+        .task-list { list-style: none; min-height: 100px; }
+        .task-item { display: flex; align-items: center; justify-content: space-between; padding: 20px 16px; background-color: #f9fbe7; border-radius: 16px; margin-bottom: 12px; transition: all 0.3s; border: 2px solid transparent; }
+        .task-item:hover { border-color: #cddc39; transform: scale(1.02); }
+        
+        .task-left { display: flex; align-items: center; gap: 16px; flex-grow: 1; cursor: pointer; }
+        
+        /* 큼직한 체크박스 */
+        .check-btn { width: 30px; height: 30px; cursor: pointer; accent-color: #8bc34a; }
+        
+        /* 초등학생용 카테고리 태그 */
+        .tag { font-size: 14px; padding: 6px 12px; border-radius: 20px; font-weight: bold; color: white; white-space: nowrap; }
+        .tag-school { background-color: #ffb74d; } /* 학교숙제: 주황 */
+        .tag-book { background-color: #4db6ac; }   /* 독서: 민트 */
+        .tag-study { background-color: #ba68c8; }  /* 문제집: 보라 */
+        .tag-home { background-color: #f06292; }   /* 내방정리: 핑크 */
+        
+        .task-text { font-size: 18px; font-weight: bold; word-break: break-word; user-select: none; }
+        
+        /* 완료 시 귀여운 효과 */
+        .task-item.completed { background-color: #eeeeee; opacity: 0.7; }
+        .task-item.completed .task-text { text-decoration: line-through; color: #9e9e9e; }
+        .task-item.completed .tag { filter: grayscale(50%); }
+
+        .delete-btn { background-color: #ffcdd2; border: none; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; color: #c62828; transition: background-color 0.2s; }
+        .delete-btn:hover { background-color: #ef9a9a; }
+
+        .empty-state { text-align: center; padding: 40px 0; color: #0288d1; font-size: 18px; font-weight: bold; display: none; }
+        .empty-state.show { display: block; }
+
+        /* 폭죽 이펙트용 캔버스 */
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; }
+
+        @media (max-width: 480px) {
+            .input-section { flex-direction: column; }
+            .input-section input[type="text"], .input-section select, .input-section button { min-height: 50px; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="ticker-wrap">
+        <div class="quote-text" id="daily-cheer">🐬 돌고래 친구가 도현이를 응원해!</div>
+    </div>
+
+    <div class="container">
+        <div class="header-top">
+            <h1>🌊 도현이의 바닷속 탐험 🐠</h1>
+        </div>
+
+        <div class="dashboard">
+            <span class="cheer-msg" id="cheer-msg">오늘도 신나게 출발해볼까?</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="overall-bar"></div>
+            </div>
+            <span class="progress-text" id="overall-text">0개 중 0개 완료!</span>
+        </div>
+
+        <div class="input-section">
+            <select id="category-select">
+                <option value="school">🎒 학교 숙제</option>
+                <option value="book">📖 독서</option>
+                <option value="study">✏️ 문제집</option>
+                <option value="home">🧸 내 방 정리</option>
+            </select>
+            <input type="text" id="task-input" placeholder="도현아, 어떤 일을 할까?">
+            <button id="add-btn">추가하기 팡!</button>
+        </div>
+
+        <ul class="task-list" id="task-list"></ul>
+        <div id="empty-state" class="empty-state">할 일을 추가하고 바다 탐험을 떠나요! 🐢</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import confetti from "https://cdn.skypack.dev/canvas-confetti"; // 완료 시 폭죽 이펙트 라이브러리
+
+        // 지희님이 제공해주신 기존 파이어베이스 설정 그대로 사용
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZ1yq2FivxetLa5IW6p1-gSvwn8oCy3fc",
+            authDomain: "my-daily-tasks-64a0b.firebaseapp.com",
+            projectId: "my-daily-tasks-64a0b",
+            storageBucket: "my-daily-tasks-64a0b.firebasestorage.app",
+            messagingSenderId: "107857208354",
+            appId: "1:107857208354:web:5b19eadf79a6342306167b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // ★ 엄마 것과 섞이지 않도록 컬렉션 이름을 도현이 전용으로 변경했습니다.
+        const tasksCollection = collection(db, 'dohyun_tasks');
+
+        let tasks = [];
+        const taskInput = document.getElementById('task-input');
+        const categorySelect = document.getElementById('category-select');
+        const taskList = document.getElementById('task-list');
+        const emptyState = document.getElementById('empty-state');
+
+        // 바다 친구들 응원 메시지
+        const cheers = [
+            "🐬 돌고래 친구가 도현이를 응원해!",
+            "🐢 거북이처럼 끈기있게 해보자!",
+            "🐙 문어 아저씨가 칭찬 스티커를 준비했어!",
+            "🐳 고래상어만큼 커다란 꿈을 꾸자!",
+            "🦀 꽃게 친구들과 함께 신나게 영차영차!",
+            "🐠 니모가 도현이의 멋진 하루를 기다려!"
+        ];
+        document.getElementById('daily-cheer').textContent = cheers[Math.floor(Math.random() * cheers.length)];
+
+        // 파이어베이스 실시간 동기화
+        onSnapshot(tasksCollection, (snapshot) => {
+            tasks = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            
+            // 미완료 항목을 위로, 생성순 정렬
+            tasks.sort((a, b) => {
+                if (a.completed === b.completed) return b.createdAt - a.createdAt;
+                return a.completed ? 1 : -1;
+            });
+            
+            renderTasks();
+            updateDashboard();
+        });
+
+        function updateDashboard() {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+            
+            document.getElementById('overall-text').textContent = `${total}개 중에서 ${completed}개 완료!`;
+            document.getElementById('overall-bar').style.width = `${percent}%`;
+
+            const cheerEl = document.getElementById('cheer-msg');
+            if (total === 0) cheerEl.textContent = "도현아, 오늘 할 일을 적어볼까?";
+            else if (percent === 0) cheerEl.textContent = "준비 완료! 출발해볼까? 🚢";
+            else if (percent < 50) cheerEl.textContent = "우와, 진짜 잘하고 있어! 🌟";
+            else if (percent < 100) cheerEl.textContent = "거의 다 왔어! 조금만 더 힘내! 💪";
+            else {
+                cheerEl.textContent = "전부 다 했어! 도현이 최고야! 🎉";
+                // 100% 달성 시 폭죽 터뜨리기
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+
+        function renderTasks() {
+            if (tasks.length === 0) {
+                emptyState.classList.add('show');
+            } else { 
+                emptyState.classList.remove('show'); 
+            }
+
+            const fragment = document.createDocumentFragment();
+            tasks.forEach(task => {
+                const li = document.createElement('li');
+                li.className = `task-item ${task.completed ? 'completed' : ''}`;
+                li.dataset.id = task.id; 
+
+                const tagNames = { school: '🎒 학교숙제', book: '📖 독서', study: '✏️ 문제집', home: '🧸 방정리' };
+                
+                li.innerHTML = `
+                    <div class="task-left">
+                        <input type="checkbox" class="check-btn" ${task.completed ? 'checked' : ''}>
+                        <span class="tag tag-${task.category}">${tagNames[task.category]}</span>
+                        <span class="task-text">${task.text}</span>
+                    </div>
+                    <button class="delete-btn">지우기</button>
+                `;
+                fragment.appendChild(li);
+            });
+
+            taskList.innerHTML = ''; 
+            taskList.appendChild(fragment);
+        }
+
+        async function addTask() {
+            const text = taskInput.value.trim();
+            if (!text) { alert('도현아, 할 일을 적어줘!'); taskInput.focus(); return; }
+            
+            await addDoc(tasksCollection, {
+                text: text,
+                category: categorySelect.value,
+                completed: false,
+                createdAt: Date.now()
+            });
+            
+            taskInput.value = ''; 
+            taskInput.focus();
+        }
+
+        // 클릭 이벤트 (삭제, 완료)
+        taskList.addEventListener('click', async (e) => {
+            const item = e.target.closest('.task-item');
+            if (!item) return;
+            const docId = item.dataset.id; 
+
+            if (e.target.classList.contains('delete-btn')) {
+                if(confirm('정말 지울까?')) {
+                    await deleteDoc(doc(db, 'dohyun_tasks', docId));
+                }
+            }
+            // 글씨나 체크박스 영역 클릭 시 완료 토글
+            else if (e.target.closest('.task-left')) {
+                const checkbox = item.querySelector('.check-btn');
+                const isCurrentlyCompleted = checkbox.checked;
+                // 클릭한 요소가 체크박스가 아니라면 상태 반전
+                const newStatus = e.target === checkbox ? isCurrentlyCompleted : !isCurrentlyCompleted;
+                
+                if (newStatus && !item.classList.contains('completed')) {
+                    // 항목 완료 시 귀여운 작은 폭죽
+                    confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+                }
+                await updateDoc(doc(db, 'dohyun_tasks', docId), { completed: newStatus });
+            }
+        });
+
+        document.getElementById('add-btn').addEventListener('click', addTask);
+        taskInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTask(); });
+
+    </script>
+</body>
+</html>
